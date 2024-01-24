@@ -1,0 +1,51 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'top.hookvip.xposed'
+    compileSdk 34
+
+    signingConfigs {
+        debug {
+            storeFile file('D:/AndroidStudio/jiuwu.jks')
+            storePassword "lovejiuwu"
+            keyAlias "久雾"
+            keyPassword "lovejiuwu"
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+        release {
+            storeFile file('D:/AndroidStudio/jiuwu.jks')
+            storePassword "lovejiuwu"
+            keyAlias "久雾"
+            keyPassword "lovejiuwu"
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+
+    defaultConfig {
+        applicationId "top.hookvip.xposed"
+        minSdk 28
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    compileOnly("de.robv.android.xposed:api:82")
+}
