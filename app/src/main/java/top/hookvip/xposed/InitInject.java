@@ -5,6 +5,7 @@ import android.content.ContextWrapper;
 import android.util.Log;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
@@ -14,8 +15,11 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class InitInject extends XC_MethodHook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
+    private static final AtomicBoolean Inject = new AtomicBoolean();
+    private static final AtomicBoolean isApplicationHooked = new AtomicBoolean();
     public static String ModulePath;
     public static XC_LoadPackage.LoadPackageParam loadParam;
+    public static Context mContext;
 
     @Override
     public void initZygote(StartupParam startupParam) throws Throwable {
@@ -26,15 +30,21 @@ public class InitInject extends XC_MethodHook implements IXposedHookLoadPackage,
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-
-        loadParam = lpparam;
-        XposedBridge.hookMethod(getAtInject(), this);
-
+        if (lpparam.isFirstApplication && !Inject.getAndSet(true)) {
+            loadParam = lpparam;
+            XposedBridge.hookMethod(getAtInject(), this);
+        }
     }
 
     @Override
     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-        super.afterHookedMethod(param);
+        if (!isApplicationHooked.getAndSet(true)) {
+
+            ContextWrapper wrapper = (ContextWrapper) param.thisObject;
+            mContext = wrapper.getBaseContext();
+
+
+        }
     }
 
     private Method getAtInject() {
